@@ -4,7 +4,7 @@
   "description": "a graphql demo",
   "main": "index.js",
   "scripts": {
-    "webpack": "webpack-dev-server --devtool inline-source-map --hot --config webpack.client.config.js"
+    "dev": "webpack-dev-server --devtool inline-source-map --hot --config webpack.client.config.js"
   },
   "keywords": [
     "graphql",
