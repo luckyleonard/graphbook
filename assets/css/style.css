@@ -10,6 +10,25 @@ p {
   max-width: 500px;
   margin: 70px auto 0 auto;
 }
+form {
+  padding-bottom: 20px;
+}
+
+form textarea {
+  width: calc(100%-20px);
+  padding: 10px;
+  border-color: #bbb;
+}
+form [type='submit'] {
+  border: none;
+  background-color: #6ca6fd;
+  color: #fff;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 14px;
+  float: right;
+}
+
 .feed {
   background-color: #bbb;
   padding: 3px;
