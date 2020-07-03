@@ -39,10 +39,10 @@ module.exports = {
     extensions: ['.js', '.jsx'],
   },
   plugins: [
+    new CleanWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
     }),
-    new CleanWebpackPlugin(),
     new MiniCssExtractPlugin({
       filename: 'bundle.css',
     }),
