@@ -8,7 +8,7 @@
     "build": "webpack --config webpack.client.build.config.js",
     "stats": "webpack --profile --json --config webpack.client.build.config.js > stats.json",
     "analyze": "webpack-bundle-analyzer stats.json",
-    "server": "nodemon --exec babel-node -- plugins require-context-hook --watch src/server src/server/index.js"
+    "server": "cross-env NODE_ENV=development nodemon --exec babel-node --plugins require-context-hook --watch src/server src/server/index.js"
   },
   "keywords": [
     "graphql",
@@ -47,6 +47,7 @@
     "babel-loader": "^8.1.0",
     "babel-plugin-require-context-hook": "^1.0.0",
     "clean-webpack-plugin": "^3.0.0",
+    "cross-env": "^7.0.2",
     "css-loader": "^3.6.0",
     "eslint": "^7.2.0",
     "eslint-config-airbnb": "^18.2.0",

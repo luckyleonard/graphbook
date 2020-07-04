@@ -16,7 +16,7 @@ export default (sequelize) => {
   context
     .keys()
     .map(context)
-    .foreach((module) => {
+    .forEach((module) => {
       const model = module(sequelize, Sequelize);
       db[model.name] = model;
     });
