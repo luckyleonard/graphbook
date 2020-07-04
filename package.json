@@ -8,7 +8,7 @@
     "build": "webpack --config webpack.client.build.config.js",
     "stats": "webpack --profile --json --config webpack.client.build.config.js > stats.json",
     "analyze": "webpack-bundle-analyzer stats.json",
-    "server": "nodemon --exec babel-node --watch src/server src/server/index.js"
+    "server": "nodemon --exec babel-node -- plugins require-context-hook --watch src/server src/server/index.js"
   },
   "keywords": [
     "graphql",
@@ -18,13 +18,19 @@
   "author": "leonard",
   "license": "MIT",
   "dependencies": {
+    "apollo-server-express": "^2.15.1",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "graphql": "^15.2.0",
+    "graphql-tools": "^6.0.12",
     "helmet": "^3.23.3",
+    "mysql2": "^2.1.0",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
-    "react-helmet": "^6.1.0"
+    "react-helmet": "^6.1.0",
+    "sequelize": "^6.3.0",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@babel/core": "^7.10.3",
@@ -39,6 +45,7 @@
     "@babel/preset-react": "^7.10.1",
     "babel-eslint": "^10.1.0",
     "babel-loader": "^8.1.0",
+    "babel-plugin-require-context-hook": "^1.0.0",
     "clean-webpack-plugin": "^3.0.0",
     "css-loader": "^3.6.0",
     "eslint": "^7.2.0",

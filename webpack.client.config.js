@@ -34,9 +34,11 @@ module.exports = {
     open: true,
   },
   plugins: [
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [path.join(__dirname, buildDirectory)],
+    }),
     new HtmlWebpackPlugin({
       template: './public/index.html',
     }),
-    new CleanWebpackPlugin(),
   ],
 };
