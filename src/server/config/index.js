@@ -5,7 +5,6 @@ module.exports = {
     database: 'graphbook_dev',
     host: 'localhost',
     dialect: 'mysql',
-    operatorsAliases: false,
     pool: {
       max: 5,
       min: 0,
@@ -20,7 +19,6 @@ module.exports = {
     host: process.env.host,
     logging: false,
     dialect: 'mysql',
-    operatorsAliases: false,
     pool: {
       max: 5,
       min: 0,
