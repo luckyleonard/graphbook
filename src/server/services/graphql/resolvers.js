@@ -21,24 +21,80 @@ import logger from '../../helpers/logger';
 
 export default function resolvers() {
   const { db } = this;
-  const { Post } = db.models;
+  const { Post, User, Chat, Message } = db.models;
 
   const resolvers = {
+    Post: {
+      user(post, args, context) {
+        return post.getUser();
+      },
+    },
+    Message: {
+      user(message, args, context) {
+        return message.getUser();
+      },
+      chat(message, args, context) {
+        return message.getChat();
+      },
+    },
+    Chat: {
+      messages(chat, args, context) {
+        return chat.getMessages({ order: [['id', 'ASC']] });
+      },
+      users(chat, args, context) {
+        return chat.getUsers();
+      },
+    },
     RootQuery: {
       posts(root, args, context) {
         return Post.findAll({ order: [['createdAt', 'DESC']] });
       },
+      chat(root, { chatId }, context) {
+        return Chat.findById(chatId, {
+          include: [
+            {
+              model: User,
+              required: true,
+            },
+            {
+              model: Message,
+            },
+          ],
+        });
+      },
+      chats(root, args, context) {
+        return User.findAll().then((users) => {
+          if (!users.length) {
+            return [];
+          }
+          const usersRow = users[0]; //暂时只用第一个用户来查询
+          return Chat.findAll({
+            include: [
+              {
+                model: User,
+                required: true,
+                through: { where: { userId: usersRow.id } },
+              },
+              {
+                model: Message,
+              },
+            ],
+          }); //findAll方法来自sequelize 选择固定用户的Chat和Chat里的所有信息
+        });
+      },
     },
     RootMutation: {
-      addPost(root, { post, user }, context) {
-        const postObject = {
-          ...post,
-          user,
-          id: posts.length + 1,
-        };
-        posts.push(postObject);
+      addPost(root, { post }, context) {
         logger.log({ level: 'info', message: 'Post was created' });
-        return postObject;
+
+        return User.findAll().then((users) => {
+          const usersRow = users[0];
+          return Post.create({ ...post }).then((newPost) => {
+            return Promise.all([newPost.setUser(usersRow.id)]).then(() => {
+              return newPost;
+            });
+          });
+        });
       },
     },
   };
