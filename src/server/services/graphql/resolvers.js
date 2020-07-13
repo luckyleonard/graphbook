@@ -50,7 +50,7 @@ export default function resolvers() {
         return Post.findAll({ order: [['createdAt', 'DESC']] });
       },
       chat(root, { chatId }, context) {
-        return Chat.findById(chatId, {
+        return Chat.findByPk(chatId, {
           include: [
             {
               model: User,
@@ -92,6 +92,33 @@ export default function resolvers() {
           return Post.create({ ...post }).then((newPost) => {
             return Promise.all([newPost.setUser(usersRow.id)]).then(() => {
               return newPost;
+            });
+          });
+        });
+      },
+      addChat(root, { chat }, context) {
+        logger.log({ level: 'info', message: 'Chat was created' });
+
+        return Chat.create().then((newChat) => {
+          return Promise.all([newChat.setUsers(chat.users)]).then(() => {
+            return newChat;
+          });
+        });
+      },
+      addMessage(root, { message }, context) {
+        logger.log({ level: 'info', message: 'Message was created' });
+
+        return User.findAll().then((users) => {
+          const usersRow = users[0];
+
+          return Message.create({
+            ...message,
+          }).then((newMessage) => {
+            return Promise.all([
+              newMessage.setUser(usersRow.id),
+              newMessage.setChat(message.chatId),
+            ]).then(() => {
+              return newMessage;
             });
           });
         });
