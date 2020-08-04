@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       // define association here
       User.hasMany(models.Post);
-      User.belongsToMany(models.Chat, { through: 'users_chats' });
+      User.belongsToMany(models.Chat, { through: 'users_chats' }); //通过中间表
     }
   }
   User.init(

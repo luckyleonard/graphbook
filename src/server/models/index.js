@@ -2,7 +2,7 @@ import Sequelize from 'sequelize';
 if (process.env.NODE_ENV === 'development') {
   require('babel-plugin-require-context-hook/register')();
 }
-//load 所有的models 返回一个db实例
+//load 所有的models 返回一个db实例,操作可以使用sequelize init替换
 export default (sequelize) => {
   let db = {};
 

@@ -7,7 +7,7 @@ import servicesLoader from './services'; //graphql service provider
 import db from './database';
 
 const utils = { db };
-const services = servicesLoader(utils);
+const services = servicesLoader(utils); //传入db实例
 
 const root = path.join(__dirname, '../../');
 
@@ -21,7 +21,7 @@ if (process.env.NODE_ENV === 'production') {
         defaultSrc: ["'self'"],
         scriptSrc: ["'self'", "'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", 'data:', '*.amazoneaws.com'],
+        imgSrc: ["'self'", 'data:', '*.amazonaws.com'],
       },
     })
   );

@@ -20,15 +20,15 @@ import logger from '../../helpers/logger';
 // ];
 
 export default function resolvers() {
-  const { db } = this;
-  const { Post, User, Chat, Message } = db.models;
+  const { db } = this; //解析数据库
+  const { Post, User, Chat, Message } = db.models; //解析数据库models
 
   const resolvers = {
     Post: {
       user(post, args, context) {
         return post.getUser();
       },
-    },
+    }, //在这里补充type Post中指定的user，获取association的user数据
     Message: {
       user(message, args, context) {
         return message.getUser();
@@ -48,7 +48,7 @@ export default function resolvers() {
     RootQuery: {
       posts(root, args, context) {
         return Post.findAll({ order: [['createdAt', 'DESC']] });
-      },
+      }, //这里只返回了Post数据表的信息，但并没有将user信息一并populate出来
       chat(root, { chatId }, context) {
         return Chat.findByPk(chatId, {
           include: [
@@ -79,7 +79,7 @@ export default function resolvers() {
                 model: Message,
               },
             ],
-          }); //findAll方法来自sequelize 选择固定用户的Chat和Chat里的所有信息
+          }); //findAll方法来自sequelize 使用include可以避免再次发起一个select避免N+1，带required表示INNER JOIN
         });
       },
     },
@@ -91,6 +91,7 @@ export default function resolvers() {
           const usersRow = users[0];
           return Post.create({ ...post }).then((newPost) => {
             return Promise.all([newPost.setUser(usersRow.id)]).then(() => {
+              //setUser显式指定了user的关联，可以getUser进行查询了
               return newPost;
             });
           });
