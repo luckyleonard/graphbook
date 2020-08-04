@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import '../../assets/css/style.css';
 import { Helmet } from 'react-helmet';
+import client from './apollo';
 
 const posts = [
   {

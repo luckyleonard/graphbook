@@ -26,10 +26,10 @@ if (process.env.NODE_ENV === 'production') {
     })
   );
   app.use(compression());
-  app.use(cors());
+  app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
 }
 
-app.use(helmet.referrerPolicy({ policy: 'same-origin' }));
+app.use(cors());
 app.use('/', express.static(path.join(root, 'dist/client')));
 app.use('/uploads', express.static(path.join(root, 'uploads')));
 
