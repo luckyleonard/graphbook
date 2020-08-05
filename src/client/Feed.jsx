@@ -31,7 +31,11 @@ function Feed() {
   const [postContent, setPostContent] = useState('');
   const { loading, error, data } = useQuery(GET_POSTS);
   const [addPost] = useMutation(ADD_POST, {
-    refetchQueries: [{ query: GET_POSTS }],
+    update(cache, { data: { addPost } }) {
+      const { posts } = cache.readQuery({ query: GET_POSTS });
+      posts.unshift(addPost);
+      cache.writeQuery({ query: GET_POSTS, data: { posts } }); //更新缓存
+    },
   });
 
   const handlePostContentChange = (event) => {
@@ -43,7 +47,23 @@ function Feed() {
     const newPost = {
       text: postContent,
     };
-    addPost({ variables: { post: newPost } }).then(() => {
+    addPost({
+      variables: { post: newPost },
+      optimisticResponse: {
+        //指定fake的返回值
+        __typename: 'mutation',
+        addPost: {
+          __typename: 'Post',
+          text: postContent,
+          id: -1,
+          user: {
+            __typename: 'User',
+            username: 'Loading...',
+            avatar: '/public/loading.gif',
+          },
+        },
+      },
+    }).then(() => {
       setPostContent('');
     });
   };
@@ -66,7 +86,9 @@ function Feed() {
       </div>
       <div className='feed'>
         {posts.map((post) => (
-          <div className='post' key={post.id}>
+          <div
+            className={'post' + (post.id < 0 ? 'optimistic' : '')}
+            key={post.id}>
             <div className='header'>
               <img src={post.user.avatar} />
               <h2>{post.user.username}</h2>
