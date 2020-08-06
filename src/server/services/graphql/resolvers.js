@@ -44,6 +44,13 @@ export default function resolvers() {
       users(chat, args, context) {
         return chat.getUsers();
       },
+      lastMessage(chat, args, context) {
+        return chat
+          .getMessages({ limit: 1, order: [['id', 'DESC']] })
+          .then((message) => {
+            return message[0];
+          }); //取最新的message，取得messages数组因为是异步，返回一个Promise，需要then
+      },
     },
     RootQuery: {
       posts(root, args, context) {
