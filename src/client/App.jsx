@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import '../../assets/css/style.css';
 import { Helmet } from 'react-helmet';
 import Feed from './Feed';
+import Chats from './Chats';
 
 // const posts = [
 //   {
@@ -34,6 +35,7 @@ class App extends Component {
           />
         </Helmet>
         <Feed />
+        <Chats />
       </div>
     );
   }
