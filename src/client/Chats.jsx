@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import gql from 'graphql-tag';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useQuery } from '@apollo/react-hooks';
 import OpenChat from './OpenChat';
 
 const GET_CHATS = gql`
@@ -61,26 +61,56 @@ const shorten = (text) => {
 
 function Chats() {
   const [openChats, setOpenChats] = useState([]);
+  const [textInputs, setTextInputs] = useState({});
   const { loading, error, data } = useQuery(GET_CHATS);
 
   const openChat = (id) => {
+    //用来展开聊天
     let [...cloneChats] = openChats; //解构clone
+    let { ...cloneInputs } = textInputs; //Object.assign({}, textInputs);
     if (cloneChats.indexOf(id) === -1) {
       //确保点击的id还未被展开
       if (cloneChats.length > 2) {
         cloneChats = cloneChats.slice(1); //展开第三个则关闭第一个
       }
       cloneChats.push(id);
+      cloneInputs[id] = '';
     }
     setOpenChats([...cloneChats]);
+    setTextInputs({ ...cloneInputs });
   };
 
   const closeChat = (id) => {
+    //用来关闭聊天
     let [...cloneChats] = openChats;
+    let { ...cloneInputs } = textInputs;
     const index = cloneChats.indexOf(id);
     cloneChats.splice(index, 1);
+    delete cloneInputs[id];
     setOpenChats([...cloneChats]);
+    setTextInputs({ ...cloneInputs });
   };
+
+  const onChangeChatInput = ({ target: { value } }, id) => {
+    //用来control用户在聊天中的输入
+    event.preventDefault();
+    let { ...cloneInputs } = textInputs;
+    cloneInputs[id] = value;
+    setTextInputs({ ...cloneInputs });
+  };
+
+  const handleKeyPress = ({ key }, id, addMessage) => {
+    //用来响应回车事件
+    const { ...cloneInputs } = textInputs;
+    if (key === 'Enter' && textInputs[id].length) {
+      addMessage({
+        variables: { message: { text: textInputs[id], chatId: id } },
+      }).then(() => {
+        cloneInputs[id] = '';
+        setTextInputs({ ...cloneInputs });
+      });
+    }
+  }; //回车时候才发送addMessage mutation
 
   if (loading) return 'Loading...';
   if (error) return error.message;
@@ -118,6 +148,9 @@ function Chats() {
             key={'chatId' + chatId}
             chatId={chatId}
             closeChat={closeChat}
+            textInputs={textInputs}
+            onChangeChatInput={onChangeChatInput}
+            handleKeyPress={handleKeyPress}
           />
         ))}
       </div>
