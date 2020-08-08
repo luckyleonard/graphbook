@@ -13,6 +13,7 @@ export default (utils) => {
   const server = new ApolloServer({
     schema: executableSchema,
     context: ({ req }) => req,
+    connectToDevTools: true,
   });
 
   return server;
