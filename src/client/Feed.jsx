@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
+import InfiniteScroll from 'react-infinite-scroller';
 
 const GET_POSTS = gql`
   {
