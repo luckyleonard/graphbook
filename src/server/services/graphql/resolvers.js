@@ -89,6 +89,25 @@ export default function resolvers() {
           }); //findAll方法来自sequelize 使用include可以避免再次发起一个select避免N+1，带required表示INNER JOIN
         });
       },
+      postsFeed(root, { page, limit }, context) {
+        let skip = 0;
+        if (page && limit) {
+          skip = page * limit;
+        }
+
+        const query = {
+          order: [['createdAt', 'DESC']],
+          offset: skip,
+        };
+
+        if (limit) {
+          query.limit = limit;
+        }
+
+        return {
+          posts: Post.findAll(query),
+        };
+      },
     },
     RootMutation: {
       addPost(root, { post }, context) {
