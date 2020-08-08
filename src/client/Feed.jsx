@@ -4,13 +4,15 @@ import { useQuery, useMutation } from '@apollo/react-hooks';
 import InfiniteScroll from 'react-infinite-scroller';
 
 const GET_POSTS = gql`
-  {
-    posts {
-      id
-      text
-      user {
-        avatar
-        username
+  query postsFeed($page: Int, $limit: Int) {
+    postsFeed(page: $page, limit: $limit) {
+      posts {
+        id
+        text
+        user {
+          avatar
+          username
+        }
       }
     }
   }
@@ -28,14 +30,26 @@ const ADD_POST = gql`
     }
   }
 `;
+
 function Feed() {
   const [postContent, setPostContent] = useState('');
-  const { loading, error, data } = useQuery(GET_POSTS);
+  const [hasMore, setHasMore] = useState(true);
+  const [page, setPage] = useState(0);
+
+  const variables = { page: 0, limit: 10 };
+  const { loading, error, data, fetchMore } = useQuery(GET_POSTS, {
+    variables,
+  });
   const [addPost] = useMutation(ADD_POST, {
     update(cache, { data: { addPost } }) {
-      const { posts } = cache.readQuery({ query: GET_POSTS });
+      const {
+        postsFeed: { posts },
+      } = cache.readQuery({
+        query: GET_POSTS,
+        variables,
+      });
       posts.unshift(addPost);
-      cache.writeQuery({ query: GET_POSTS, data: { posts } }); //更新缓存
+      cache.writeQuery({ query: GET_POSTS, variables, data: { posts } }); //更新缓存
     },
   });
 
@@ -69,9 +83,36 @@ function Feed() {
     });
   };
 
+  const loadMore = (fetchMore) => {
+    fetchMore({
+      variables: {
+        page: page + 1,
+      },
+      updateQuery(previousResult, { fetchMoreResult }) {
+        if (!fetchMoreResult.postsFeed.posts.length) {
+          setHasMore(false);
+          return previousResult;
+        }
+        setPage((page) => page + 1);
+        const newData = {
+          postsFeed: {
+            __typename: 'PostFeed',
+            posts: [
+              ...previousResult.postsFeed.posts,
+              ...fetchMoreResult.postsFeed.posts,
+            ],
+          },
+        };
+        return newData;
+      },
+    });
+  };
+
   if (loading) return 'Loading...';
   if (error) return error.message;
-  const { posts } = data;
+  const {
+    postsFeed: { posts },
+  } = data;
 
   return (
     <div className='container'>
@@ -82,21 +123,31 @@ function Feed() {
             onChange={handlePostContentChange}
             placeholder='Write your custom post!'
           />
-          <input type='submit' value='submit' />
+          <input type='submit' value='Submit' />
         </form>
       </div>
       <div className='feed'>
-        {posts.map((post) => (
-          <div
-            className={'post' + (post.id < 0 ? 'optimistic' : '')}
-            key={post.id}>
-            <div className='header'>
-              <img src={post.user.avatar} />
-              <h2>{post.user.username}</h2>
+        <InfiniteScroll
+          loadMore={() => loadMore(fetchMore)}
+          hasMore={hasMore}
+          loader={
+            <div className='loader' key='loader'>
+              Loading...
             </div>
-            <p className='content'>{post.text}</p>
-          </div>
-        ))}
+          }>
+          {posts.map((post) => (
+            <div
+              className={'post' + (post.id < 0 ? 'optimistic' : '')}
+              key={post.id}>
+              {/*optimisitic UI 在submit中设定的post.id 为 -1*/}
+              <div className='header'>
+                <img src={post.user.avatar} />
+                <h2>{post.user.username}</h2>
+              </div>
+              <p className='content'>{post.text}</p>
+            </div>
+          ))}
+        </InfiniteScroll>
       </div>
     </div>
   );

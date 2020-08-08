@@ -11,24 +11,24 @@ const typeDefinitions = `
     user: User
   }
 
-  type PostFeed {
-    posts:[Post]
-  }
-
   type Message {
     id: Int
     text: String
     chat:Chat
     user:User
   }
-
+  
   type Chat {
     id:Int
     messages: [Message]
     users: [User]
     lastMessage: Message
   }
-
+  
+  type PostFeed {
+    posts:[Post]
+  }
+  
   input PostInput {
     text: String!
   }
