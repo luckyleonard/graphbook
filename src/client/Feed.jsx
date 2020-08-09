@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
-import InfiniteScroll from 'react-infinite-scroller';
 import Loading from './components/Loading';
 import Error from './components/Error';
+import FeedList from './components/posts/FeedList';
 
 const GET_POSTS = gql`
   query postsFeed($page: Int, $limit: Int) {
@@ -134,29 +134,12 @@ function Feed() {
           <input type='submit' value='Submit' />
         </form>
       </div>
-      <div className='feed'>
-        <InfiniteScroll
-          loadMore={() => loadMore(fetchMore)}
-          hasMore={hasMore}
-          loader={
-            <div className='loader' key='loader'>
-              Loading...
-            </div>
-          }>
-          {posts.map((post) => (
-            <div
-              className={'post' + (post.id < 0 ? 'optimistic' : '')}
-              key={post.id}>
-              {/*optimisitic UI 在submit中设定的post.id 为 -1*/}
-              <div className='header'>
-                <img src={post.user.avatar} />
-                <h2>{post.user.username}</h2>
-              </div>
-              <p className='content'>{post.text}</p>
-            </div>
-          ))}
-        </InfiniteScroll>
-      </div>
+      <FeedList
+        hasMore={hasMore}
+        fetchMore={fetchMore}
+        loadMore={loadMore}
+        posts={posts}
+      />
     </div>
   );
 }
