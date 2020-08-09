@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import '../../assets/css/style.css';
 import { Helmet } from 'react-helmet';
 import Feed from './Feed';
@@ -23,21 +23,19 @@ import Chats from './Chats';
 //   },
 // ];
 
-class App extends Component {
-  render() {
-    return (
-      <div className='container'>
-        <Helmet>
-          <title>GraphQL - Demo</title>
-          <meta
-            name='description'
-            content='this is a demo project for practice with GraphQL and React'
-          />
-        </Helmet>
-        <Feed />
-        <Chats />
-      </div>
-    );
-  }
+function App() {
+  return (
+    <div className='container'>
+      <Helmet>
+        <title>GraphQL - Demo</title>
+        <meta
+          name='description'
+          content='this is a demo project for practice with GraphQL and React'
+        />
+      </Helmet>
+      <Feed />
+      <Chats />
+    </div>
+  );
 }
 export default App;

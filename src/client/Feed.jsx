@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import gql from 'graphql-tag';
 import { useQuery, useMutation } from '@apollo/react-hooks';
 import InfiniteScroll from 'react-infinite-scroller';
+import Loading from './components/Loading';
+import Error from './components/Error';
 
 const GET_POSTS = gql`
   query postsFeed($page: Int, $limit: Int) {
@@ -39,7 +41,7 @@ function Feed() {
   const variables = { page: 0, limit: 10 };
   const { loading, error, data, fetchMore } = useQuery(GET_POSTS, {
     variables,
-  });
+  }); //Pagination
   const [addPost] = useMutation(ADD_POST, {
     update(cache, { data: { addPost } }) {
       const {
@@ -77,7 +79,7 @@ function Feed() {
             avatar: '/public/loading.gif',
           },
         },
-      },
+      }, //Optimistic UI
     }).then(() => {
       setPostContent('');
     });
@@ -108,8 +110,14 @@ function Feed() {
     });
   };
 
-  if (loading) return 'Loading...';
-  if (error) return error.message;
+  if (loading) return <Loading />;
+  if (error)
+    return (
+      <Error>
+        <p>{error.message}</p>
+      </Error>
+    );
+
   const {
     postsFeed: { posts },
   } = data;
