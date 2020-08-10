@@ -32,13 +32,13 @@ const ADD_POST = gql`
     }
   }
 `;
+const variables = { page: 0, limit: 10 };
 
 function Feed() {
   const [postContent, setPostContent] = useState('');
   const [hasMore, setHasMore] = useState(true);
   const [page, setPage] = useState(0);
 
-  const variables = { page: 0, limit: 10 };
   const { loading, error, data, fetchMore } = useQuery(GET_POSTS, {
     variables,
   }); //Pagination
