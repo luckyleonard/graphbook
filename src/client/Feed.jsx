@@ -1,24 +1,8 @@
 import React, { useState } from 'react';
 import gql from 'graphql-tag';
-import { useQuery, useMutation } from '@apollo/react-hooks';
-import Loading from './components/Loading';
-import Error from './components/Error';
+import { useMutation } from '@apollo/react-hooks';
 import FeedList from './components/posts/FeedList';
-
-const GET_POSTS = gql`
-  query postsFeed($page: Int, $limit: Int) {
-    postsFeed(page: $page, limit: $limit) {
-      posts {
-        id
-        text
-        user {
-          avatar
-          username
-        }
-      }
-    }
-  }
-`;
+import PostsFeedQuery from './components/queries/PostsFeedQuery';
 
 const ADD_POST = gql`
   mutation addPost($post: PostInput!) {
@@ -36,12 +20,7 @@ const variables = { page: 0, limit: 10 };
 
 function Feed() {
   const [postContent, setPostContent] = useState('');
-  const [hasMore, setHasMore] = useState(true);
-  const [page, setPage] = useState(0);
 
-  const { loading, error, data, fetchMore } = useQuery(GET_POSTS, {
-    variables,
-  }); //Pagination
   const [addPost] = useMutation(ADD_POST, {
     update(cache, { data: { addPost } }) {
       const {
@@ -85,43 +64,6 @@ function Feed() {
     });
   };
 
-  const loadMore = (fetchMore) => {
-    fetchMore({
-      variables: {
-        page: page + 1,
-      },
-      updateQuery(previousResult, { fetchMoreResult }) {
-        if (!fetchMoreResult.postsFeed.posts.length) {
-          setHasMore(false);
-          return previousResult;
-        }
-        setPage((page) => page + 1);
-        const newData = {
-          postsFeed: {
-            __typename: 'PostFeed',
-            posts: [
-              ...previousResult.postsFeed.posts,
-              ...fetchMoreResult.postsFeed.posts,
-            ],
-          },
-        };
-        return newData;
-      },
-    });
-  };
-
-  if (loading) return <Loading />;
-  if (error)
-    return (
-      <Error>
-        <p>{error.message}</p>
-      </Error>
-    );
-
-  const {
-    postsFeed: { posts },
-  } = data;
-
   return (
     <div className='container'>
       <div className='postForm'>
@@ -134,12 +76,9 @@ function Feed() {
           <input type='submit' value='Submit' />
         </form>
       </div>
-      <FeedList
-        hasMore={hasMore}
-        fetchMore={fetchMore}
-        loadMore={loadMore}
-        posts={posts}
-      />
+      <PostsFeedQuery variables={variables}>
+        <FeedList />
+      </PostsFeedQuery>
     </div>
   );
 }
