@@ -33,17 +33,15 @@ const ADD_POST = gql`
 function AddPostMutation({ variables = { page: 0, limit: 10 }, children }) {
   const [addPost] = useMutation(ADD_POST, {
     update(cache, { data: { addPost } }) {
-      const {
-        postsFeed: { posts },
-      } = cache.readQuery({
+      const data = cache.readQuery({
         query: GET_POSTS,
         variables,
       });
-      posts.unshift(addPost); //放到最开头
+      data.postsFeed.posts.unshift(addPost); //放到最开头
       cache.writeQuery({
         query: GET_POSTS,
         variables,
-        data: { postsFeed: { posts } },
+        data,
       }); //更新缓存,页面展示才会刷新,更新的data格式要和从cache中取出来的一致
     },
   });
